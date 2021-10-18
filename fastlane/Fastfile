@@ -1,0 +1,12 @@
+lane :test do
+  errors = validate_ipa(
+    path: "result/test.ipa",
+    platform: "ios",
+    username: "username",
+    password: "password"
+  )
+  
+  if errors.nil?
+    upload_to_appstore
+  end
+end
