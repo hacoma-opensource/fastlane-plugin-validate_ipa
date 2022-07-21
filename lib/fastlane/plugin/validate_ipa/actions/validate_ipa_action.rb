@@ -6,8 +6,8 @@ module Fastlane
     class ValidateIpaAction < Action
       def self.run(params)
         UI.message "Start IPA validation."
-
-        command = ["xcrun", " altool"]
+        
+        command = ["xcrun", "altool"]
         command << "--validate-app"
         command << "--file"
         command << params[:path]
@@ -20,13 +20,14 @@ module Fastlane
         command << "--output-format xml"
         command << "| tr -d '\n'"
         
-        result = sh(command.join(" "))
+        output = sh(command.join(" "))
+        split_result = output.split("\n")
+        result = split_result[-1]
         plist = Plist.parse_xml(result)
         errors = plist["product-errors"]
-
+        
         if errors.nil?
           UI.success("IPA validation success => " + plist["success-message"])
-          return nil
         else
           reason = errors
             .each_with_index
@@ -34,7 +35,6 @@ module Fastlane
             .join(" ")
           UI.error("IPA validation failure => " + reason)
           UI.user_error!("IPA validation failure.")
-          return errors
         end
       end
 
@@ -48,36 +48,40 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_VALIDATE_IPA_PATH",
-                                       description: "IPA Path",
-                                       is_string: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Path is not valid.") unless (value and not value.empty?)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :platform,
-                                       env_name: "FL_VALIDATE_IPA_PLATFORM",
-                                       description: "IPA Platform",
-                                       is_string: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Platform is not valid.") unless (value and not value.empty?)
-                                         platform = %w(ios macos)
-                                         UI.user_error!("Unsupported platform. (Supported platforms : #{platform})") unless platform.include?(value)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :username,
-                                       env_name: "FL_VALIDATE_IPA_USERNAME",
-                                       description: "Apple ID",
-                                       is_string: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Apple ID is not valid.") unless (value and not value.empty?)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :password,
-                                       env_name: "FL_VALIDATE_IPA_PASSWORD",
-                                       description: "Apple ID or App-specific password",
-                                       is_string: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Apple ID or App-specific password is not valid.") unless (value and not value.empty?)
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :path,  
+            env_name: "FL_VALIDATE_IPA_PATH",
+            description: "IPA Path",
+            is_string: true,
+            verify_block: proc do |value|
+              UI.user_error!("Path is not valid.") unless (value and not value.empty?)
+            end),
+          FastlaneCore::ConfigItem.new(
+            key: :platform,
+            env_name: "FL_VALIDATE_IPA_PLATFORM",
+            description: "IPA Platform",
+            is_string: true,
+            verify_block: proc do |value|
+              UI.user_error!("Platform is not valid.") unless (value and not value.empty?)
+              platform = %w(ios macos)
+              UI.user_error!("Unsupported platform. (Supported platforms : #{platform})") unless platform.include?(value)
+            end),
+          FastlaneCore::ConfigItem.new(
+            key: :username,
+            env_name: "FL_VALIDATE_IPA_USERNAME",
+            description: "Apple ID",
+            is_string: true,
+            verify_block: proc do |value|
+              UI.user_error!("Apple ID is not valid.") unless (value and not value.empty?)
+            end),
+          FastlaneCore::ConfigItem.new(
+            key: :password,
+            env_name: "FL_VALIDATE_IPA_PASSWORD",
+            description: "Apple ID or App-specific password",
+            is_string: true,
+            verify_block: proc do |value|
+              UI.user_error!("Apple ID or App-specific password is not valid.") unless (value and not value.empty?)
+            end)
         ]
       end
 
