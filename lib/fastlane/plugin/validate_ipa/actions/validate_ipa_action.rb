@@ -37,19 +37,19 @@ module Fastlane
           UI.user_error!("IPA validation failure.")
         end
       end
-
+      
       def self.description
         "Validate the IPA using altool."
       end
-
+      
       def self.authors
         ["hacoma"]
       end
-
+      
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
-            key: :path,  
+            key: :path,
             env_name: "FL_VALIDATE_IPA_PATH",
             description: "IPA Path",
             is_string: true,
@@ -84,7 +84,7 @@ module Fastlane
             end)
         ]
       end
-
+      
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end

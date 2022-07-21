@@ -20,16 +20,12 @@ Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plu
 
 ```ruby
 lane :test do
-  errors = validate_ipa(
+  validate_ipa(
     path: "result/test.ipa",
     platform: "ios",
     username: "username",
     password: "password" 
   )
-  
-  if errors.nil?
-    upload_to_appstore
-  end
 end
 ```
 
